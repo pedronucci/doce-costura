@@ -5,23 +5,24 @@ import Link from "next/link";
 import { useMemo, useState } from "react";
 import { Search } from "lucide-react";
 import { Drawer } from "@/components/ui/drawer";
-import { products } from "@/lib/catalog/data";
+
+export type SearchItem = { slug: string; name: string; summary: string; printName: string; image: string | null };
 
 const normalize = (s: string) =>
   s.normalize("NFD").replace(/\p{Diacritic}/gu, "").toLowerCase();
 
 /**
- * Busca instantânea no catálogo. Na Etapa 3 passa a consultar o banco
- * (busca por texto no PostgreSQL) com a mesma interface.
+ * Busca instantânea sobre o catálogo visível (carregado do banco pelo layout).
+ * Com catálogo grande, trocar por busca no servidor (PostgreSQL full-text).
  */
-export function SearchDialog({ open, onClose }: { open: boolean; onClose: () => void }) {
+export function SearchDialog({ open, onClose, items }: { open: boolean; onClose: () => void; items: SearchItem[] }) {
   const [query, setQuery] = useState("");
 
   const results = useMemo(() => {
     const q = normalize(query.trim());
     if (q.length < 2) return [];
-    return products.filter((p) => normalize(`${p.name} ${p.summary} ${p.print?.name ?? ""}`).includes(q));
-  }, [query]);
+    return items.filter((p) => normalize(`${p.name} ${p.summary} ${p.printName}`).includes(q));
+  }, [query, items]);
 
   return (
     <Drawer open={open} onClose={onClose} title="Buscar produtos" side="top">
@@ -58,9 +59,7 @@ export function SearchDialog({ open, onClose }: { open: boolean; onClose: () => 
                     className="flex items-center gap-4 rounded-xl p-2 transition-colors hover:bg-papel"
                   >
                     <span className="relative h-16 w-16 shrink-0 overflow-hidden rounded-lg bg-linho">
-                      {p.images[0] && (
-                        <Image src={p.images[0].src} alt="" fill sizes="64px" className="object-cover" />
-                      )}
+                      {p.image && <Image src={p.image} alt="" fill sizes="64px" className="object-cover" />}
                     </span>
                     <span>
                       <span className="block font-serif text-[1.1rem] text-cacau">{p.name}</span>

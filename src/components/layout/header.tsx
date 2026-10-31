@@ -7,7 +7,8 @@ import { Wordmark } from "./logo";
 import { MobileMenu } from "./mobile-menu";
 import { SearchDialog } from "./search-dialog";
 import { useShop } from "@/lib/store/shop-context";
-import { categoryNav } from "@/lib/catalog/navigation";
+import type { NavLink } from "@/lib/catalog/navigation";
+import type { SearchItem } from "./search-dialog";
 import { cn } from "@/lib/format";
 
 function CountBadge({ count, label }: { count: number; label: string }) {
@@ -25,7 +26,7 @@ function CountBadge({ count, label }: { count: number; label: string }) {
 const iconBtn =
   "relative grid h-11 w-11 place-items-center rounded-full text-cacau transition-colors duration-300 hover:bg-nevoa/70 hover:text-rosa-profundo";
 
-export function Header() {
+export function Header({ categoryNav, searchItems }: { categoryNav: NavLink[]; searchItems: SearchItem[] }) {
   const { cartCount, favorites } = useShop();
   const [menuOpen, setMenuOpen] = useState(false);
   const [searchOpen, setSearchOpen] = useState(false);
@@ -102,8 +103,8 @@ export function Header() {
         </nav>
       </header>
 
-      <MobileMenu open={menuOpen} onClose={() => setMenuOpen(false)} />
-      <SearchDialog open={searchOpen} onClose={() => setSearchOpen(false)} />
+      <MobileMenu open={menuOpen} onClose={() => setMenuOpen(false)} categoryNav={categoryNav} />
+      <SearchDialog open={searchOpen} onClose={() => setSearchOpen(false)} items={searchItems} />
     </>
   );
 }

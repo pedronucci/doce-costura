@@ -1,22 +1,27 @@
 # Doce Costura — loja virtual
 
-Enxovais e detalhes para sua cozinha. E-commerce em Next.js 16 + TypeScript + Tailwind CSS 4.
+Enxovais e detalhes para sua cozinha. Next.js 16 + TypeScript + Tailwind CSS 4 + PostgreSQL (Supabase) + Drizzle ORM + Better Auth.
 
-> **Status:** Etapa 1 (arquitetura + homepage). A loja **não está pronta para vendas reais**. Veja `docs/STATUS.md`.
+> **Status:** Etapa 1 concluída e painel de produtos antecipado. A loja **não está pronta para vendas reais**. Veja `docs/STATUS.md`.
 
-## Requisitos
+## Começar
 
-- Node.js 22 LTS ou superior
-- npm 10+
-- (Etapa 3 em diante) PostgreSQL 16+
+- **Ligar ao Supabase e usar o painel:** `docs/GUIA-SUPABASE-E-PAINEL.md`
+- Arquitetura e identidade visual: `docs/ARQUITETURA.md`
 
-## Instalação
+## Desenvolvimento local
+
+Requisitos: Node.js 22+, npm 10+ e um PostgreSQL 15+ (o do Supabase ou um local).
 
 ```bash
 npm install
-cp .env.example .env.local   # preencha conforme as etapas avançarem
-npm run dev                  # http://localhost:3000
+cp .env.example .env.local   # preencha DATABASE_URL, BETTER_AUTH_SECRET, ADMIN_SETUP_TOKEN
+npm run db:migrate           # cria as tabelas
+npm run db:seed              # categorias e produtos iniciais
+npm run dev                  # http://localhost:3000 — painel em /admin
 ```
+
+Sem `SUPABASE_URL`, as fotos enviadas pelo painel ficam em `.data/uploads` (apenas desenvolvimento).
 
 ## Scripts
 
@@ -24,21 +29,25 @@ npm run dev                  # http://localhost:3000
 |---|---|
 | `npm run dev` | Servidor de desenvolvimento |
 | `npm run build` / `npm start` | Build e servidor de produção |
-| `npm run lint` | ESLint |
-| `npm run typecheck` | Verificação de tipos |
-| `npm run preview:export` | Exportação estática apenas para pré-visualizar a interface (sem backend) |
+| `npm run lint` · `npm run typecheck` · `npm test` | Qualidade e testes |
+| `npm run db:generate` | Gera uma nova migração SQL após alterar `src/db/schema.ts` |
+| `npm run db:migrate` | Aplica as migrações no banco de `DATABASE_URL` |
+| `npm run db:seed` | Executa o catálogo inicial (idempotente) |
+| `npm run db:studio` | Visualizador do banco (Drizzle Studio) |
 
 ## Onde está cada coisa
 
-- `src/app/(loja)` — páginas públicas
-- `src/components` — componentes (layout, home, produto, ui)
-- `src/lib/catalog/data.ts` — catálogo inicial (sem preços/estoque inventados)
-- `src/lib/config/store.ts` — dados da empresa, WhatsApp, barra de benefícios
+- `src/app/(loja)` — páginas públicas · `src/app/admin` — painel
+- `src/db/schema.ts` — modelo de dados · `drizzle/` — migrações SQL, catálogo inicial e ajustes do Supabase
+- `src/lib/catalog` — consultas da vitrine, validação e regras de publicação
+- `src/lib/auth` — login, papéis e proteção do painel
+- `src/lib/storage` — fotos (Supabase Storage / local)
 - `src/app/globals.css` — identidade visual (cores, fontes)
-- `prisma/schema.prisma` — modelo de dados
-- `docs/ARQUITETURA.md` — arquitetura, mapa do site, identidade visual
-- `docs/STATUS.md` — funcionalidades concluídas, simuladas e pendentes
 
-## Imagens
+## Segurança (resumo)
 
-As fotos em `public/images/produtos` foram recortadas das artes enviadas, sem alteração de cor ou estampa. Para a loja em produção, recomenda-se fotografar cada peça individualmente (fundo neutro, 1600 px ou mais, várias vistas) — o painel administrativo (Etapa 3) fará o upload.
+- Toda página e ação do painel verifica sessão e papel no servidor; o `proxy.ts` só faz o redirecionamento inicial.
+- Senhas com hash (scrypt) pelo Better Auth; limite de tentativas no login, recuperação de senha, primeiro acesso e upload.
+- Fotos validadas pelo conteúdo (não pela extensão), sem metadados de localização, com limite de tamanho.
+- Tabelas com RLS ativado no Supabase (sem acesso pela API pública); chave secreta só no servidor.
+- Cada alteração de produto, categoria e estoque fica registrada em auditoria.

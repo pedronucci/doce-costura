@@ -1,7 +1,7 @@
 import { notFound } from "next/navigation";
 import { ButtonLink } from "@/components/ui/button-link";
 import { FlourishHeart } from "@/components/ui/ornaments";
-import { categories, products } from "@/lib/catalog/data";
+import { getCategories, getStorefrontProducts } from "@/lib/catalog/queries";
 
 /**
  * Espaço reservado para as páginas das próximas etapas.
@@ -22,9 +22,10 @@ const planned: Record<string, { title: string; stage: string }> = {
   "termos-de-uso": { title: "Termos de uso", stage: "texto jurídico para revisão" },
 };
 
-function resolve(rota: string[]) {
+async function resolve(rota: string[]) {
   const path = rota.join("/");
   if (planned[path]) return planned[path];
+  const [categories, products] = await Promise.all([getCategories(), getStorefrontProducts()]);
   if (rota[0] === "categoria" && rota.length === 2) {
     const c = categories.find((x) => x.slug === rota[1]);
     if (c) return { title: c.name, stage: "Etapa 2 — Interface" };
@@ -36,7 +37,11 @@ function resolve(rota: string[]) {
   return null;
 }
 
-export function generateStaticParams() {
+// Páginas temporárias: produtos criados depois do build são renderizados sob demanda.
+export const instant = false;
+
+export async function generateStaticParams() {
+  const [categories, products] = await Promise.all([getCategories(), getStorefrontProducts()]);
   return [
     ...Object.keys(planned).map((k) => ({ rota: k.split("/") })),
     ...categories.map((c) => ({ rota: ["categoria", c.slug] })),
@@ -46,7 +51,7 @@ export function generateStaticParams() {
 
 export default async function PlannedPage({ params }: PageProps<"/[...rota]">) {
   const { rota } = await params;
-  const page = resolve(rota);
+  const page = await resolve(rota);
   if (!page) notFound();
 
   return (

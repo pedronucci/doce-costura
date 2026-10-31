@@ -1,9 +1,8 @@
 /**
  * Tipos do catálogo usados pela interface.
  *
- * Na Etapa 3 estes dados passam a vir do PostgreSQL (Prisma). Os tipos
- * foram desenhados para espelhar o schema em `prisma/schema.prisma`,
- * para que a troca da fonte de dados não altere os componentes.
+ * Formato dos produtos na vitrine, montado a partir do banco
+ * (ver `queries.ts`).
  *
  * Regra de negócio: informação comercial não fornecida é `null` e a
  * interface mostra "pendente de cadastro" — nunca um valor inventado.
@@ -19,12 +18,17 @@ export type ProductImage = {
 export type Category = {
   slug: string;
   name: string;
+  shortName: string | null;
   description: string | null;
   position: number;
 };
 
 export type Product = {
+  id: string;
   slug: string;
+  /** coming_soon: vitrine sem venda ("Preço em breve"); active: à venda. */
+  status: "coming_soon" | "active";
+  isFeatured: boolean;
   name: string;
   /** Descrição curta exibida em cards. Baseada apenas no que é visível na foto. */
   summary: string;

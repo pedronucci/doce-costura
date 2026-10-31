@@ -14,7 +14,7 @@ Next.js 16 (App Router, Vercel)
    ├─ Route Handlers  /api/webhooks/mercadopago · /api/webhooks/melhorenvio · /api/frete
    └─ Middleware de proteção (/admin, /conta)
         │
-        ├─ PostgreSQL gerenciado (Neon ou Supabase) ── Prisma 7
+        ├─ PostgreSQL gerenciado (Supabase) ── Drizzle ORM
         ├─ Armazenamento de imagens (Vercel Blob ou Cloudflare R2)
         ├─ Upstash Redis (rate limiting)
         ├─ Resend (e-mails transacionais)
@@ -30,9 +30,9 @@ Next.js 16 (App Router, Vercel)
 | Estilo | **Tailwind CSS 4** com tokens da marca | Paleta, tipografia e espaçamentos centralizados em `globals.css` (`@theme`). |
 | Validação | **Zod 4** | Mesmo esquema valida formulário no navegador e dados no servidor. |
 | Banco | **PostgreSQL gerenciado** (Neon ou Supabase) | Backups automáticos e restauração por ponto no tempo (PITR). |
-| ORM | **Prisma 7** | Schema tipado, migrações versionadas. O rascunho completo está em `prisma/schema.prisma` (validado). |
-| Autenticação | **Better Auth** (proposta) | Biblioteca TypeScript consolidada, adaptador Prisma, e-mail/senha com verificação, recuperação de senha, papéis (cliente/equipe/admin), sessões em banco e rate limiting nativo. *Mudança em relação a "solução consolidada" genérica — a confirmar na Etapa 3.* |
-| Imagens | **Vercel Blob** (ou Cloudflare R2) | Upload pelo painel, URLs públicas otimizadas pelo `next/image` (AVIF/WebP). |
+| ORM | **Drizzle ORM** (substituiu o Prisma em 31/10/2026, aprovado) | TypeScript, schema tipado em `src/db/schema.ts`, migrações em SQL puro (`drizzle/`) que podem ser coladas no editor SQL do Supabase. Sem binários nativos — mais leve na Vercel. |
+| Autenticação | **Better Auth** (aprovado) | Usuários e sessões no nosso banco, e-mail/senha, recuperação de senha, papéis (cliente/equipe/admin). Limite de tentativas próprio, no PostgreSQL. |
+| Imagens | **Supabase Storage** (aprovado), bucket público `produtos` | Upload pelo painel, URLs públicas otimizadas pelo `next/image` (AVIF/WebP). |
 | E-mail | **Resend** | Confirmação de pedido, instruções de Pix, recuperação de senha, double opt-in da newsletter. |
 | Rate limiting | **Upstash Redis** | Login, cadastro, recuperação de senha, cupom, cotação de frete e criação de pagamento. |
 | Pagamentos | **Mercado Pago** — Checkout Bricks (Payment Brick + Status Screen Brick) | Tokenização do cartão feita pelo componente do Mercado Pago; dados de cartão nunca passam pelo nosso servidor. Pix com QR Code e copia-e-cola, boleto e cartões conforme a conta. |
@@ -96,11 +96,11 @@ src/
   components/
     layout/  home/  product/  ui/
   lib/
-    catalog/   (dados → Prisma na Etapa 3)
+    catalog/   (consultas da vitrine, regras e validação do cadastro)
     config/    (configurações da loja → tabela StoreSettings)
     store/     (estado do navegador: favoritos, contador do carrinho)
     format.ts
-prisma/schema.prisma
+src/db/schema.ts · drizzle/ (migrações SQL)
 docs/
 ```
 

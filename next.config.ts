@@ -7,6 +7,9 @@ import type { NextConfig } from "next";
  */
 const isPreviewExport = process.env.PREVIEW_EXPORT === "1";
 
+// Fotos enviadas pelo painel ficam no Supabase Storage (bucket público).
+const supabaseHost = process.env.SUPABASE_URL ? new URL(process.env.SUPABASE_URL).hostname : null;
+
 const securityHeaders = [
   { key: "X-Content-Type-Options", value: "nosniff" },
   { key: "Referrer-Policy", value: "strict-origin-when-cross-origin" },
@@ -20,8 +23,16 @@ const nextConfig: NextConfig = {
   cacheComponents: !isPreviewExport,
   partialPrefetching: !isPreviewExport,
   poweredByHeader: false,
+  experimental: {
+    // Fotos são reduzidas no navegador antes do envio; 4 MB respeita o limite da Vercel (4,5 MB).
+    serverActions: { bodySizeLimit: "4mb" },
+  },
   images: {
     formats: ["image/avif", "image/webp"],
+    localPatterns: [{ pathname: "/images/**" }, { pathname: "/api/uploads/**" }],
+    remotePatterns: supabaseHost
+      ? [{ protocol: "https", hostname: supabaseHost, pathname: "/storage/v1/object/public/**" }]
+      : [],
     ...(isPreviewExport ? { unoptimized: true } : {}),
   },
   ...(isPreviewExport

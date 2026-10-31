@@ -3,12 +3,11 @@ import { Gift } from "lucide-react";
 import { SectionHeading } from "@/components/ui/section-heading";
 import { ButtonLink } from "@/components/ui/button-link";
 import { FlourishHeart, SprigHeart } from "@/components/ui/ornaments";
-import { getProductsByCategory } from "@/lib/catalog/data";
+import type { Product } from "@/lib/catalog/types";
 import { ProductCard } from "@/components/product/product-card";
 
 /** Kits especiais: mostra os kits cadastrados; sem kits, um aviso honesto de "em preparação". */
-export function GiftKits() {
-  const kits = getProductsByCategory("kits-para-presente");
+export function GiftKits({ kits }: { kits: Product[] }) {
   return (
     <section aria-labelledby="kits-title" className="py-20 sm:py-24">
       <div className="mx-auto max-w-7xl px-5 sm:px-8">

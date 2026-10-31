@@ -5,9 +5,9 @@ import { ChevronRight, Heart, User } from "lucide-react";
 import { Drawer } from "@/components/ui/drawer";
 import { Wordmark } from "./logo";
 import { SprigHeart } from "@/components/ui/ornaments";
-import { categoryNav, institutionalNav } from "@/lib/catalog/navigation";
+import { institutionalNav, type NavLink } from "@/lib/catalog/navigation";
 
-export function MobileMenu({ open, onClose }: { open: boolean; onClose: () => void }) {
+export function MobileMenu({ open, onClose, categoryNav }: { open: boolean; onClose: () => void; categoryNav: NavLink[] }) {
   return (
     <Drawer open={open} onClose={onClose} title="Menu" side="left">
       <div className="flex flex-col items-center gap-2 border-b border-dourado/20 px-6 pt-8 pb-6">

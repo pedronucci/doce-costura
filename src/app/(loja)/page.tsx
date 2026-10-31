@@ -5,21 +5,25 @@ import { PrintPicker } from "@/components/home/print-picker";
 import { Details, Essence, GiftKits } from "@/components/home/editorial-sections";
 import { Newsletter } from "@/components/home/newsletter";
 import { SectionHeading } from "@/components/ui/section-heading";
-import { products, withPhotosFirst } from "@/lib/catalog/data";
+import { getCategories, getStorefrontProducts, productsInCategory } from "@/lib/catalog/queries";
 import type { Product } from "@/lib/catalog/types";
 
 /** Mais vendidos e avaliações só aparecem com dados reais (pedidos pagos / avaliações verificadas). */
 const bestSellers: Product[] = [];
 
-export default function HomePage() {
-  const newest = withPhotosFirst([...products].sort((a, b) => b.createdAt.localeCompare(a.createdAt)));
+export default async function HomePage() {
+  const [products, categories] = await Promise.all([getStorefrontProducts(), getCategories()]);
+  const newest = [...products]
+    .sort((a, b) => b.createdAt.localeCompare(a.createdAt))
+    .sort((a, b) => Number(b.images.length > 0) - Number(a.images.length > 0))
+    .slice(0, 9);
 
   return (
     <>
       <Hero />
 
       {/* 1. Coleção em destaque */}
-      <FeaturedCollection />
+      <FeaturedCollection products={products} categories={categories} />
 
       {/* 2. Mais vendidos — oculto até existirem vendas reais */}
       <ProductRail id="mais-vendidos" eyebrow="Queridinhos" title="Mais vendidos" products={bestSellers} />
@@ -48,7 +52,7 @@ export default function HomePage() {
       </section>
 
       {/* 5. Kits especiais */}
-      <GiftKits />
+      <GiftKits kits={productsInCategory(products, "kits-para-presente")} />
 
       {/* 6. Nossa essência */}
       <Essence />

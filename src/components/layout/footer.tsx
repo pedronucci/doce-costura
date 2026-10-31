@@ -1,7 +1,8 @@
 import Image from "next/image";
 import Link from "next/link";
 import { storeSettings } from "@/lib/config/store";
-import { categoryNav, institutionalNav, policyNav } from "@/lib/catalog/navigation";
+import { institutionalNav, policyNav } from "@/lib/catalog/navigation";
+import { getCategoryNav } from "@/lib/catalog/queries";
 import { Pending } from "@/components/ui/pending";
 
 function FooterColumn({ title, links }: { title: string; links: { href: string; label: string }[] }) {
@@ -21,8 +22,9 @@ function FooterColumn({ title, links }: { title: string; links: { href: string; 
   );
 }
 
-export function Footer() {
+export async function Footer() {
   const { company } = storeSettings;
+  const categoryNav = await getCategoryNav();
   return (
     <footer className="mt-auto border-t border-dourado/20 bg-[#faf3ea]">
       <div className="mx-auto grid max-w-7xl gap-12 px-6 py-16 sm:px-8 lg:grid-cols-[1.1fr_2fr] lg:gap-16">

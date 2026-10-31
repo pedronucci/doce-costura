@@ -43,6 +43,7 @@ next-env.d.ts
 # variáveis de exemplo podem ser versionadas
 !.env.example
 
-# prisma client gerado
-/src/generated
 /preview-out
+
+# armazenamento e banco locais
+/.data
