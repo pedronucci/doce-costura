@@ -1,0 +1,594 @@
+// =============================================================================
+// Doce Costura — modelo de dados (rascunho da Etapa 1, implementado na Etapa 3)
+//
+// Princípios:
+// - Valores monetários em centavos (Int). Nunca Float.
+// - Pedido guarda "fotografia" (snapshot) de nome, preço e frete no momento da compra.
+// - Pagamento só muda de status pelo backend (webhook verificado + consulta à API).
+// - Nenhum dado de cartão é armazenado: apenas IDs e status do Mercado Pago.
+// - Toda movimentação de estoque e mudança de status relevante gera registro de auditoria.
+// =============================================================================
+
+generator client {
+  provider = "prisma-client"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+// ----------------------------------------------------------------------------
+// Usuários e autenticação (tabelas compatíveis com Better Auth)
+// ----------------------------------------------------------------------------
+
+enum Role {
+  CUSTOMER
+  STAFF   // atendimento/expedição: pedidos e envios
+  ADMIN   // acesso total, inclusive preços, cupons e configurações
+}
+
+model User {
+  id            String    @id @default(cuid())
+  name          String
+  email         String    @unique
+  emailVerified Boolean   @default(false)
+  image         String?
+  role          Role      @default(CUSTOMER)
+  phone         String?
+  cpf           String?   // exigido para emissão de NF-e e etiquetas; armazenar apenas se necessário
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+  deletedAt     DateTime? // anonimização a pedido do titular (LGPD)
+
+  sessions      Session[]
+  accounts      Account[]
+  addresses     Address[]
+  orders        Order[]
+  favorites     Favorite[]
+  reviews       Review[]
+  carts         Cart[]
+  tickets       SupportTicket[]
+}
+
+model Session {
+  id        String   @id @default(cuid())
+  token     String   @unique
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  expiresAt DateTime
+  ipAddress String?
+  userAgent String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([userId])
+}
+
+model Account {
+  id                    String    @id @default(cuid())
+  userId                String
+  user                  User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  accountId             String
+  providerId            String
+  password              String?   // hash (scrypt/argon2) gerado pela biblioteca de autenticação
+  accessToken           String?
+  refreshToken          String?
+  accessTokenExpiresAt  DateTime?
+  refreshTokenExpiresAt DateTime?
+  scope                 String?
+  idToken               String?
+  createdAt             DateTime  @default(now())
+  updatedAt             DateTime  @updatedAt
+
+  @@index([userId])
+}
+
+model Verification {
+  id         String   @id @default(cuid())
+  identifier String
+  value      String
+  expiresAt  DateTime
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  @@index([identifier])
+}
+
+model Address {
+  id           String  @id @default(cuid())
+  userId       String
+  user         User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  label        String? // "Casa", "Trabalho"
+  recipient    String
+  cep          String  // somente dígitos
+  street       String
+  number       String
+  complement   String?
+  neighborhood String
+  city         String
+  state        String  @db.Char(2)
+  isDefault    Boolean @default(false)
+
+  @@index([userId])
+}
+
+// ----------------------------------------------------------------------------
+// Catálogo
+// ----------------------------------------------------------------------------
+
+model Category {
+  id          String            @id @default(cuid())
+  slug        String            @unique
+  name        String
+  description String?
+  imageUrl    String?
+  position    Int               @default(0)
+  isActive    Boolean           @default(true)
+  seoTitle    String?
+  seoDesc     String?
+  products    ProductCategory[]
+  createdAt   DateTime          @default(now())
+  updatedAt   DateTime          @updatedAt
+}
+
+enum ProductStatus {
+  DRAFT    // em cadastro (sem preço/foto) — não aparece na loja
+  ACTIVE
+  ARCHIVED
+}
+
+model Product {
+  id               String            @id @default(cuid())
+  slug             String            @unique
+  name             String
+  summary          String?
+  description      String?
+  materials        String?           // pendente até ser informado
+  dimensions       String?           // ex.: "70 × 45 cm" — pendente até ser informado
+  careInstructions String?
+  status           ProductStatus     @default(DRAFT)
+  isFeatured       Boolean           @default(false)
+  seoTitle         String?
+  seoDesc          String?
+  // Campos para Google Merchant Center / Instagram Shopping
+  gtin             String?
+  brand            String            @default("Doce Costura")
+  googleCategory   String?
+
+  categories       ProductCategory[]
+  variants         ProductVariant[]
+  images           ProductImage[]
+  reviews          Review[]
+  favorites        Favorite[]
+  createdAt        DateTime          @default(now())
+  updatedAt        DateTime          @updatedAt
+
+  @@index([status])
+}
+
+model ProductCategory {
+  productId  String
+  categoryId String
+  position   Int      @default(0)
+  product    Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
+  category   Category @relation(fields: [categoryId], references: [id], onDelete: Cascade)
+
+  @@id([productId, categoryId])
+}
+
+/// Variação vendável (estampa, cor, kit). Todo produto tem ao menos uma.
+model ProductVariant {
+  id                  String          @id @default(cuid())
+  productId           String
+  product             Product         @relation(fields: [productId], references: [id], onDelete: Cascade)
+  sku                 String          @unique
+  name                String          // ex.: "Estampa Chá Azul"
+  priceCents          Int?            // null = pendente (variante não pode ser vendida)
+  compareAtPriceCents Int?            // preço "de" para promoções
+  stock               Int             @default(0)
+  reserved            Int             @default(0) // reservado por pedidos aguardando pagamento
+  weightGrams         Int?            // necessário para cotação de frete
+  heightCm            Decimal?        @db.Decimal(6, 1)
+  widthCm             Decimal?        @db.Decimal(6, 1)
+  lengthCm            Decimal?        @db.Decimal(6, 1)
+  swatchUrl           String?
+  isActive            Boolean         @default(true)
+  position            Int             @default(0)
+  cartItems           CartItem[]
+  orderItems          OrderItem[]
+  stockMovements      StockMovement[]
+
+  @@index([productId])
+}
+
+model ProductImage {
+  id        String   @id @default(cuid())
+  productId String
+  product   Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
+  url       String
+  alt       String
+  width     Int
+  height    Int
+  position  Int      @default(0)
+
+  @@index([productId])
+}
+
+enum StockMovementReason {
+  MANUAL_ADJUSTMENT
+  ORDER_RESERVED
+  ORDER_RELEASED   // pagamento expirado/recusado/cancelado
+  ORDER_FULFILLED
+  RETURNED
+}
+
+model StockMovement {
+  id        String              @id @default(cuid())
+  variantId String
+  variant   ProductVariant      @relation(fields: [variantId], references: [id])
+  delta     Int
+  reason    StockMovementReason
+  orderId   String?
+  actorId   String?             // usuário do painel que fez o ajuste
+  note      String?
+  createdAt DateTime            @default(now())
+
+  @@index([variantId, createdAt])
+}
+
+// ----------------------------------------------------------------------------
+// Carrinho, favoritos e cupons
+// ----------------------------------------------------------------------------
+
+model Cart {
+  id              String     @id @default(cuid())
+  userId          String?
+  user            User?      @relation(fields: [userId], references: [id], onDelete: SetNull)
+  anonymousToken  String?    @unique // cookie httpOnly para visitantes
+  couponCode      String?
+  email           String?    // somente com consentimento para recuperação de carrinho
+  recoveryConsent Boolean    @default(false)
+  items           CartItem[]
+  createdAt       DateTime   @default(now())
+  updatedAt       DateTime   @updatedAt
+
+  @@index([userId])
+}
+
+model CartItem {
+  id        String         @id @default(cuid())
+  cartId    String
+  cart      Cart           @relation(fields: [cartId], references: [id], onDelete: Cascade)
+  variantId String
+  variant   ProductVariant @relation(fields: [variantId], references: [id])
+  quantity  Int
+
+  @@unique([cartId, variantId])
+}
+
+model Favorite {
+  userId    String
+  productId String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  product   Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
+  createdAt DateTime @default(now())
+
+  @@id([userId, productId])
+}
+
+enum CouponType {
+  PERCENT
+  FIXED_CENTS
+  FREE_SHIPPING
+}
+
+model Coupon {
+  id              String     @id @default(cuid())
+  code            String     @unique
+  type            CouponType
+  value           Int        // % (1–100) ou centavos
+  minSubtotal     Int?
+  maxUses         Int?
+  maxUsesPerUser  Int?
+  usedCount       Int        @default(0)
+  startsAt        DateTime?
+  endsAt          DateTime?
+  isActive        Boolean    @default(true)
+  orders          Order[]
+  createdAt       DateTime   @default(now())
+}
+
+// ----------------------------------------------------------------------------
+// Pedidos, pagamentos e envios
+// ----------------------------------------------------------------------------
+
+enum OrderStatus {
+  PENDING_PAYMENT
+  PAID
+  IN_PREPARATION
+  SHIPPED
+  DELIVERED
+  CANCELED
+  REFUNDED
+  PARTIALLY_REFUNDED
+}
+
+model Order {
+  id               String        @id @default(cuid())
+  number           Int           @unique @default(autoincrement()) // número exibido ao cliente
+  userId           String?
+  user             User?         @relation(fields: [userId], references: [id], onDelete: SetNull)
+  status           OrderStatus   @default(PENDING_PAYMENT)
+  idempotencyKey   String        @unique // impede pedidos duplicados por duplo clique/reenvio
+
+  // Comprador (permite checkout como visitante)
+  customerName     String
+  customerEmail    String
+  customerPhone    String?
+  customerCpf      String?
+
+  // Endereço de entrega (snapshot)
+  shipRecipient    String
+  shipCep          String
+  shipStreet       String
+  shipNumber       String
+  shipComplement   String?
+  shipNeighborhood String
+  shipCity         String
+  shipState        String        @db.Char(2)
+
+  // Valores calculados no servidor (centavos)
+  subtotalCents    Int
+  discountCents    Int           @default(0)
+  shippingCents    Int
+  totalCents       Int
+  currency         String        @default("BRL")
+  couponId         String?
+  coupon           Coupon?       @relation(fields: [couponId], references: [id])
+
+  items            OrderItem[]
+  payments         Payment[]
+  shipment         Shipment?
+  events           OrderEvent[]
+  acceptedTermsAt  DateTime      // aceite dos termos e da política de trocas
+  createdAt        DateTime      @default(now())
+  updatedAt        DateTime      @updatedAt
+
+  @@index([status, createdAt])
+  @@index([customerEmail])
+}
+
+model OrderItem {
+  id          String          @id @default(cuid())
+  orderId     String
+  order       Order           @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  variantId   String?
+  variant     ProductVariant? @relation(fields: [variantId], references: [id], onDelete: SetNull)
+  productName String          // snapshot
+  variantName String          // snapshot
+  sku         String
+  unitCents   Int             // snapshot do preço no momento da compra
+  quantity    Int
+  totalCents  Int
+  review      Review?
+}
+
+enum PaymentMethod {
+  PIX
+  CREDIT_CARD
+  DEBIT_CARD
+  BOLETO
+  OTHER
+}
+
+enum PaymentStatus {
+  PENDING
+  IN_PROCESS
+  APPROVED
+  REJECTED
+  CANCELED
+  REFUNDED
+  CHARGED_BACK
+  EXPIRED
+}
+
+model Payment {
+  id                String        @id @default(cuid())
+  orderId           String
+  order             Order         @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  provider          String        @default("mercadopago")
+  providerPaymentId String?       @unique
+  method            PaymentMethod
+  status            PaymentStatus @default(PENDING)
+  statusDetail      String?
+  amountCents       Int           // conciliado com Order.totalCents
+  installments      Int?
+  feeCents          Int?          // juros/tarifas informados pelo provedor
+  pixQrCode         String?       // "copia e cola" (exibido ao comprador)
+  pixQrCodeBase64   String?
+  pixExpiresAt      DateTime?
+  boletoUrl         String?
+  cardLastFour      String?       // apenas para exibição; nunca número completo/CVV
+  cardBrand         String?
+  approvedAt        DateTime?
+  refundedCents     Int           @default(0)
+  createdAt         DateTime      @default(now())
+  updatedAt         DateTime      @updatedAt
+
+  @@index([orderId])
+}
+
+/// Registro bruto de webhooks recebidos — garante idempotência e auditoria.
+model WebhookEvent {
+  id          String    @id @default(cuid())
+  provider    String    // "mercadopago" | "melhorenvio"
+  eventId     String    // x-request-id / id da notificação
+  topic       String
+  resourceId  String
+  signatureOk Boolean
+  payload     Json
+  processedAt DateTime?
+  error       String?
+  receivedAt  DateTime  @default(now())
+
+  @@unique([provider, eventId])
+  @@index([provider, resourceId])
+}
+
+enum ShipmentStatus {
+  PENDING
+  LABEL_PURCHASED
+  POSTED
+  IN_TRANSIT
+  OUT_FOR_DELIVERY
+  DELIVERED
+  RETURNED
+  LOST
+}
+
+model Shipment {
+  id               String         @id @default(cuid())
+  orderId          String         @unique
+  order            Order          @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  provider         String         @default("melhorenvio")
+  serviceName      String         // ex.: "Correios PAC" (snapshot da cotação escolhida)
+  quotedCents      Int
+  quotedDays       Int
+  providerOrderId  String?
+  trackingCode     String?
+  trackingUrl      String?
+  status           ShipmentStatus @default(PENDING)
+  postedAt         DateTime?
+  deliveredAt      DateTime?
+  updatedAt        DateTime       @updatedAt
+}
+
+model OrderEvent {
+  id        String   @id @default(cuid())
+  orderId   String
+  order     Order    @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  type      String   // "status_changed", "payment_approved", "tracking_added"...
+  message   String
+  actorId   String?  // null = sistema/webhook
+  data      Json?
+  createdAt DateTime @default(now())
+
+  @@index([orderId, createdAt])
+}
+
+// ----------------------------------------------------------------------------
+// Avaliações (somente de compras entregues), atendimento e marketing
+// ----------------------------------------------------------------------------
+
+enum ReviewStatus {
+  PENDING
+  APPROVED
+  REJECTED
+}
+
+model Review {
+  id          String       @id @default(cuid())
+  productId   String
+  product     Product      @relation(fields: [productId], references: [id], onDelete: Cascade)
+  userId      String
+  user        User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+  orderItemId String       @unique // garante "compra verificada"
+  orderItem   OrderItem    @relation(fields: [orderItemId], references: [id])
+  rating      Int          // 1–5
+  title       String?
+  body        String
+  status      ReviewStatus @default(PENDING)
+  createdAt   DateTime     @default(now())
+}
+
+model SupportTicket {
+  id        String   @id @default(cuid())
+  userId    String?
+  user      User?    @relation(fields: [userId], references: [id], onDelete: SetNull)
+  orderId   String?
+  name      String
+  email     String
+  subject   String
+  message   String
+  status    String   @default("open")
+  createdAt DateTime @default(now())
+}
+
+model NewsletterSubscriber {
+  id             String    @id @default(cuid())
+  email          String    @unique
+  consentAt      DateTime  // momento do aceite (LGPD)
+  consentText    String    // texto exato aceito
+  confirmedAt    DateTime? // double opt-in
+  unsubscribedAt DateTime?
+  source         String?
+}
+
+enum DataRequestType {
+  ACCESS
+  CORRECTION
+  DELETION
+  PORTABILITY
+  REVOKE_CONSENT
+}
+
+/// Solicitações de titulares (LGPD, art. 18).
+model DataSubjectRequest {
+  id          String          @id @default(cuid())
+  email       String
+  type        DataRequestType
+  details     String?
+  status      String          @default("open")
+  resolvedAt  DateTime?
+  createdAt   DateTime        @default(now())
+}
+
+model Banner {
+  id        String    @id @default(cuid())
+  title     String
+  subtitle  String?
+  imageUrl  String
+  imageAlt  String
+  ctaLabel  String?
+  ctaHref   String?
+  position  Int       @default(0)
+  startsAt  DateTime?
+  endsAt    DateTime?
+  isActive  Boolean   @default(true)
+}
+
+/// Configurações editáveis no painel (linha única, id = "default").
+model StoreSettings {
+  id                 String   @id @default("default")
+  announcements      String[] // barra de benefícios — apenas benefícios reais
+  whatsappNumber     String?
+  whatsappMessage    String   @default("Olá! Gostaria de conhecer melhor os produtos da Doce Costura.")
+  legalName          String?
+  cnpj               String?
+  address            String?
+  contactEmail       String?
+  contactPhone       String?
+  serviceHours       String?
+  instagramUrl       String?
+  originCep          String?  // origem dos envios (Melhor Envio)
+  pixExpirationMin   Int      @default(30)
+  maxInstallments    Int?     // limite configurado na conta Mercado Pago
+  ga4MeasurementId   String?
+  metaPixelId        String?
+  searchConsoleToken String?
+  updatedAt          DateTime @updatedAt
+}
+
+model AuditLog {
+  id        String   @id @default(cuid())
+  actorId   String?
+  action    String   // "product.update", "order.refund", "settings.update"...
+  entity    String
+  entityId  String?
+  diff      Json?
+  ip        String?
+  createdAt DateTime @default(now())
+
+  @@index([entity, entityId])
+}
