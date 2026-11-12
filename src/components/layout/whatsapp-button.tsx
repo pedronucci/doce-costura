@@ -1,9 +1,9 @@
 import { MessageCircle } from "lucide-react";
-import { storeSettings } from "@/lib/config/store";
+import { getPublicStoreSettings } from "@/lib/config/settings-repository";
 
 /** Botão discreto de WhatsApp. Só aparece quando o número estiver configurado. */
-export function WhatsAppButton() {
-  const { number, message } = storeSettings.whatsapp;
+export async function WhatsAppButton() {
+  const { number, message } = (await getPublicStoreSettings()).whatsapp;
   if (!number) return null;
   const href = `https://wa.me/${number.replace(/\D/g, "")}?text=${encodeURIComponent(message)}`;
   return (

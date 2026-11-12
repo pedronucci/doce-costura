@@ -1,8 +1,8 @@
 /**
  * Configurações da loja.
  *
- * Na Etapa 3 estes valores passam a ser editados no painel administrativo
- * (tabela `StoreSettings`). Campos `null` estão pendentes de informação
+ * Valores padrão da marca. Os contatos editáveis são carregados da tabela
+ * store_settings por getPublicStoreSettings. Campos `null` estão pendentes de informação
  * da Doce Costura e a interface não exibe valores inventados no lugar.
  */
 export type StoreSettings = {

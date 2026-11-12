@@ -35,6 +35,7 @@ Legenda: ✔ concluída · ◐ simulada/provisória · ○ pendente
 | Histórico de estoque e auditoria | ✔ | |
 | Vitrine atualizada ao salvar | ✔ | Cache renovado a cada alteração |
 | Consulta de pedidos | ◐ | Lista paginada e detalhes protegidos para equipe/admin; criação, pagamento e operação de envio pendentes |
+| Configurações da loja | ✔ / ◐ | Empresa, contatos, WhatsApp, Instagram, mensagens e CEP de origem editáveis por admin; dados reais aguardam preenchimento. Ver `docs/CONFIGURACOES-DA-LOJA.md` |
 | Importação por planilha (ex.: exportação da Shopee) | ○ | Aguardando o arquivo exportado |
 
 ## Próximas etapas

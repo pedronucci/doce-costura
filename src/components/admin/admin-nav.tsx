@@ -10,10 +10,10 @@ const items = [
   { href: "/admin/produtos", label: "Produtos", icon: Package },
   { href: "/admin/categorias", label: "Categorias", icon: FolderTree },
   { href: "/admin/pedidos", label: "Pedidos", icon: Receipt },
+  { href: "/admin/configuracoes", label: "Configurações", icon: Settings },
 ];
 const soon = [
   { label: "Cupons", icon: Tag },
-  { label: "Configurações", icon: Settings },
 ];
 
 export function AdminNav() {

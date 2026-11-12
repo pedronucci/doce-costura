@@ -1,6 +1,6 @@
 import Image from "next/image";
 import Link from "next/link";
-import { storeSettings } from "@/lib/config/store";
+import { getPublicStoreSettings } from "@/lib/config/settings-repository";
 import { institutionalNav, policyNav } from "@/lib/catalog/navigation";
 import { getCategoryNav } from "@/lib/catalog/queries";
 import { Pending } from "@/components/ui/pending";
@@ -24,8 +24,8 @@ function FooterColumn({ title, links }: { title: string; links: { href: string; 
 }
 
 export async function Footer() {
+  const [storeSettings, categoryNav] = await Promise.all([getPublicStoreSettings(), getCategoryNav()]);
   const { company } = storeSettings;
-  const categoryNav = await getCategoryNav();
   return (
     <footer className="mt-auto border-t border-dourado/20 bg-[#faf3ea]">
       <div className="mx-auto grid max-w-7xl gap-12 px-6 py-16 sm:px-8 lg:grid-cols-[1.1fr_2fr] lg:gap-16">
@@ -42,6 +42,7 @@ export async function Footer() {
             Enxovais, estampas e detalhes para deixar sua casa ainda mais sua.
           </p>
           <CookiePreferencesButton />
+          {storeSettings.social.instagram && <a href={storeSettings.social.instagram} target="_blank" rel="noopener noreferrer" className="mt-4 text-sm text-rosa-profundo underline underline-offset-4">Acompanhe no Instagram</a>}
         </div>
 
         <div className="grid grid-cols-2 gap-10 sm:grid-cols-3">
@@ -65,8 +66,10 @@ export async function Footer() {
               Endereço: <Pending value={company.address} />
             </span>
             <span>
-              E-mail: <Pending value={company.email} />
+              E-mail: {company.email ? <a href={`mailto:${company.email}`} className="underline underline-offset-4">{company.email}</a> : <Pending value={null} />}
             </span>
+            {company.phone && <span>Telefone: <a href={`tel:${company.phone}`} className="underline underline-offset-4">{company.phone}</a></span>}
+            {company.serviceHours && <span>Atendimento: {company.serviceHours}</span>}
           </address>
           <p>© {storeSettings.name}. Todos os direitos reservados.</p>
         </div>
