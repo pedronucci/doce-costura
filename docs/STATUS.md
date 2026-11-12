@@ -16,7 +16,8 @@ Legenda: ✔ concluída · ◐ simulada/provisória · ○ pendente
 | Newsletter com consentimento | ◐ | Formulário desabilitado com aviso prévio; gravação e double opt-in pendentes |
 | Botão de WhatsApp | ◐ | Oculto até o número ser informado |
 | Sitemap, robots, metadados, cabeçalhos de segurança | ✔ | Sitemap a partir do banco |
-| Catálogo, categorias, busca, produto e favoritos | ✔ / ◐ | Interfaces implementadas e testadas em prévia local; integração com banco ainda não validada nesta cópia |
+| Catálogo, categorias, busca, produto e favoritos | ✔ / ◐ | Publicados com Supabase; catálogo, busca e detalhes verificados no site público. Favoritos permanecem locais |
+| Revisão da compra | ◐ | `/checkout` confere preços e estoque no servidor; sem confirmação, reserva ou cobrança. Ver `docs/CHECKOUT-E-PEDIDOS.md` |
 | Páginas institucionais e conta | ○ | Continuam em preparação |
 
 ## Antecipado da Etapa 3 — Painel de produtos
@@ -33,6 +34,7 @@ Legenda: ✔ concluída · ◐ simulada/provisória · ○ pendente
 | Upload de fotos | ✔ / ◐ | Testado com armazenamento local; **Supabase Storage implementado, mas não testado daqui** (o Supabase não é acessível do ambiente de desenvolvimento) |
 | Histórico de estoque e auditoria | ✔ | |
 | Vitrine atualizada ao salvar | ✔ | Cache renovado a cada alteração |
+| Consulta de pedidos | ◐ | Lista paginada e detalhes protegidos para equipe/admin; criação, pagamento e operação de envio pendentes |
 | Importação por planilha (ex.: exportação da Shopee) | ○ | Aguardando o arquivo exportado |
 
 ## Próximas etapas
@@ -43,6 +45,6 @@ Legenda: ✔ concluída · ◐ simulada/provisória · ○ pendente
 | 3 — Backend (restante) | Área do cliente, pedidos, cupons, configurações da loja, e-mails | ○ |
 | 4 — Pagamentos e logística | Mercado Pago (testes), webhooks, Melhor Envio (sandbox) | ○ |
 | 5 — Testes | Fluxos de compra, segurança, webhooks, responsividade | ○ |
-| 6 — Publicação | Deploy, domínio, HTTPS, banco de produção, backups | ○ |
+| 6 — Publicação | Vitrine publicada na Vercel com HTTPS, GitHub e Supabase. Domínio próprio e configuração/verificação de backups pendentes | ◐ |
 
 **A loja não está pronta para vendas reais** até a conclusão e validação das Etapas 2 a 5.

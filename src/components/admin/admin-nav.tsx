@@ -9,9 +9,9 @@ const items = [
   { href: "/admin", label: "Visão geral", icon: LayoutDashboard, exact: true },
   { href: "/admin/produtos", label: "Produtos", icon: Package },
   { href: "/admin/categorias", label: "Categorias", icon: FolderTree },
+  { href: "/admin/pedidos", label: "Pedidos", icon: Receipt },
 ];
 const soon = [
-  { label: "Pedidos", icon: Receipt },
   { label: "Cupons", icon: Tag },
   { label: "Configurações", icon: Settings },
 ];
