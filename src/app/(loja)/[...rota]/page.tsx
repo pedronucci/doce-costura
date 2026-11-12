@@ -7,6 +7,9 @@ import { CartView } from "@/components/product/cart-view";
 import { ButtonLink } from "@/components/ui/button-link";
 import { FlourishHeart } from "@/components/ui/ornaments";
 import { getCategories, getStorefrontProducts } from "@/lib/catalog/queries";
+import { InstitutionalPage } from "@/components/institutional/institutional-page";
+import { getPublicStoreSettings } from "@/lib/config/settings-repository";
+import { institutionalPages, isInstitutionalSlug } from "@/lib/config/institutional";
 
 /**
  * Espaço reservado para as páginas das próximas etapas.
@@ -57,6 +60,7 @@ export async function generateStaticParams() {
 export default async function PlannedPage({ params }: PageProps<"/[...rota]">) {
   const { rota } = await params;
   const path = rota.join("/");
+  if (isInstitutionalSlug(path)) return <InstitutionalPage slug={path} settings={await getPublicStoreSettings()} />;
   if (["colecao", "busca", "favoritos"].includes(path) || rota[0] === "categoria" && rota.length === 2) {
     const [products, categories] = await Promise.all([getStorefrontProducts(), getCategories()]);
     const category = rota[0] === "categoria" ? categories.find((c) => c.slug === rota[1]) : undefined;
@@ -89,6 +93,11 @@ export default async function PlannedPage({ params }: PageProps<"/[...rota]">) {
 
 export async function generateMetadata({ params }: PageProps<"/[...rota]">): Promise<Metadata> {
   const { rota } = await params;
+  const path = rota.join("/");
+  if (isInstitutionalSlug(path)) {
+    const page = institutionalPages[path];
+    return { title: page.title, description: page.description, alternates: { canonical: `/${path}` }, robots: { index: page.index, follow: true } };
+  }
   const page = await resolve(rota);
   const isProduct = rota[0] === "produto";
   const product = isProduct ? (await getStorefrontProducts()).find((p) => p.slug === rota[1]) : null;

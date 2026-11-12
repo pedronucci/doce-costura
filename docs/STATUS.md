@@ -18,7 +18,8 @@ Legenda: ✔ concluída · ◐ simulada/provisória · ○ pendente
 | Sitemap, robots, metadados, cabeçalhos de segurança | ✔ | Sitemap a partir do banco |
 | Catálogo, categorias, busca, produto e favoritos | ✔ / ◐ | Publicados com Supabase; catálogo, busca e detalhes verificados no site público. Favoritos permanecem locais |
 | Revisão da compra | ◐ | `/checkout` confere preços e estoque no servidor; sem confirmação, reserva ou cobrança. Ver `docs/CHECKOUT-E-PEDIDOS.md` |
-| Páginas institucionais e conta | ○ | Continuam em preparação |
+| Páginas institucionais | ✔ / ◐ | Sobre, Contato, FAQ e políticas implementados; identidade empresarial e revisão operacional/jurídica antes das vendas pendentes. Ver `docs/PAGINAS-INSTITUCIONAIS.md` |
+| Conta do cliente | ○ | Continua em preparação |
 
 ## Antecipado da Etapa 3 — Painel de produtos
 

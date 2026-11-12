@@ -1,0 +1,54 @@
+export const institutionalPages = {
+  sobre: { title: "Sobre a Doce Costura", description: "Enxovais, estampas e detalhes para viver a sua cozinha com delicadeza.", index: true },
+  contato: { title: "Fale com a Doce Costura", description: "Encontre os canais de contato e os horários de atendimento da Doce Costura.", index: true },
+  "perguntas-frequentes": { title: "Perguntas frequentes", description: "Tire suas dúvidas sobre as peças, o catálogo e a abertura das compras online.", index: true },
+  "politica-de-privacidade": { title: "Política de privacidade", description: "Entenda como a Doce Costura utiliza dados e armazena suas preferências.", index: false },
+  "trocas-e-devolucoes": { title: "Trocas e devoluções", description: "Orientações sobre atendimento, arrependimento e problemas com produtos.", index: false },
+  "politica-de-entrega": { title: "Política de entrega", description: "Informações sobre a preparação do frete e da entrega na loja online.", index: false },
+  "termos-de-uso": { title: "Termos de uso", description: "Condições de navegação e funcionamento atual da vitrine Doce Costura.", index: false },
+} as const;
+
+export type InstitutionalSlug = keyof typeof institutionalPages;
+export function isInstitutionalSlug(value: string): value is InstitutionalSlug {
+  return Object.hasOwn(institutionalPages, value);
+}
+
+export const policyContent: Record<Exclude<InstitutionalSlug, "sobre" | "contato" | "perguntas-frequentes">, Array<{ title: string; paragraphs: string[] }>> = {
+  "politica-de-privacidade": [
+    { title: "Quem cuida dos dados", paragraphs: ["A Doce Costura é responsável pelas informações tratadas para o funcionamento desta loja. A identificação da empresa e os canais disponíveis para contato aparecem ao final desta página."] },
+    { title: "Navegação, preferências e segurança", paragraphs: ["Favoritos e carrinho são guardados neste navegador, sem sincronização com uma conta de cliente. A sua escolha de cookies também fica salva no dispositivo. Você pode remover essas informações nas configurações do navegador; isso apaga suas escolhas locais.", "O acesso ao painel administrativo utiliza dados de identificação e cookies de sessão. Registros técnicos, como endereço IP e informações de acesso, podem ser tratados para segurança, autenticação e prevenção de abuso. A conta de cliente e a compra online ainda não estão disponíveis."] },
+    { title: "Contato e serviços utilizados", paragraphs: ["Ao entrar em contato pelos canais divulgados, você fornece as informações incluídas na sua mensagem. Envie apenas o necessário para o atendimento; não envie senhas nem dados completos de cartão.", "A hospedagem e o armazenamento do site utilizam Vercel e Supabase. Esses serviços podem processar dados técnicos em infraestrutura fora do Brasil. Links para WhatsApp e Instagram levam a serviços externos, com suas próprias políticas de privacidade; eles não são carregados como widgets de rastreamento nesta página."] },
+    { title: "Finalidades e conservação", paragraphs: ["Os dados são utilizados para disponibilizar os recursos solicitados, proteger o site, atender contatos e cumprir obrigações aplicáveis. Conforme a finalidade, o tratamento pode se apoiar em procedimentos solicitados pelo titular, execução contratual, obrigação legal, interesse legítimo ou consentimento, quando necessário.", "As escolhas locais permanecem até serem removidas no navegador. As sessões administrativas expiram em até sete dias. Demais registros são mantidos pelo tempo necessário à finalidade e às obrigações aplicáveis; você pode pedir esclarecimentos pelos canais de atendimento."] },
+    { title: "Cookies e seus direitos", paragraphs: ["Neste momento não estão ativos scripts de análise de visitas nem de publicidade. As preferências de análise e marketing podem ser revistas no botão abaixo; eventuais ferramentas futuras deverão respeitar a escolha registrada.", "Você pode solicitar confirmação de tratamento, acesso, correção e informações sobre compartilhamento, além de revogar consentimento e pedir exclusão ou outros direitos previstos na LGPD, observadas as hipóteses legais. Utilize os canais de contato abaixo. Poderá ser necessário confirmar sua identidade para proteger seus dados."] },
+  ],
+  "trocas-e-devolucoes": [
+    { title: "Atendimento para sua compra", paragraphs: ["A compra online nesta vitrine ainda está em preparação. Se a sua compra foi realizada em outro canal, use também o atendimento e o número do pedido desse canal para facilitar a identificação."] },
+    { title: "Arrependimento em compras a distância", paragraphs: ["Em compras realizadas fora do estabelecimento comercial, o Código de Defesa do Consumidor prevê o direito de arrependimento em até sete dias, contados da assinatura ou do recebimento do produto ou serviço, conforme o caso. O exercício desse direito inclui a restituição dos valores pagos, nos termos legais."] },
+    { title: "Como pedir ajuda", paragraphs: ["Entre em contato pelos canais divulgados abaixo, informando o número do pedido e o motivo da solicitação. Para um problema com a peça, descreva o ocorrido; fotos podem ajudar no atendimento. Não publique seus dados pessoais em redes sociais.", "O atendimento deverá orientar a devolução e o acompanhamento da solicitação. Não envie a peça para um endereço encontrado em outro anúncio sem confirmar o destino com a loja."] },
+    { title: "Produto com problema ou diferente do pedido", paragraphs: ["Problemas de qualidade, avarias e divergências devem ser comunicados ao atendimento. Os direitos e as garantias legais são preservados; esta página não limita os prazos previstos em lei. Trocas por preferência de estampa, fora das hipóteses legais, dependem de condições previamente informadas pela loja."] },
+  ],
+  "politica-de-entrega": [
+    { title: "As entregas online estão em preparação", paragraphs: ["Ainda não há contratação de frete, emissão de etiquetas ou confirmação de envio por esta vitrine. Não há prazo, área de cobertura ou benefício de frete anunciado até que essas condições estejam disponíveis."] },
+    { title: "Valor e prazo antes da compra", paragraphs: ["Quando as vendas forem abertas, as opções de entrega, os custos, as restrições e os prazos deverão ser apresentados antes da confirmação da compra. O valor dependerá das condições efetivamente oferecidas para o destino e para as peças escolhidas."] },
+    { title: "Endereço e acompanhamento", paragraphs: ["Confira CEP, número, complemento e destinatário antes de confirmar um pedido. Caso perceba um erro, entre em contato com a loja para verificar as possibilidades de correção. A disponibilidade de rastreamento será informada conforme o serviço contratado."] },
+    { title: "Dúvidas sobre uma entrega", paragraphs: ["Para tratar de atraso, avaria ou dificuldade no recebimento de uma compra já realizada, informe o número do pedido pelos canais de atendimento. Para pedidos feitos em outras plataformas, mantenha também o contato no canal em que comprou."] },
+  ],
+  "termos-de-uso": [
+    { title: "Uma vitrine para conhecer as peças", paragraphs: ["Este site apresenta os produtos e os canais de atendimento da Doce Costura. A confirmação de compras, o pagamento e o cálculo de frete ainda estão em preparação. A navegação, a seleção de favoritos e a revisão do carrinho não criam um pedido nem uma cobrança."] },
+    { title: "Informações dos produtos", paragraphs: ["Consulte a descrição, os materiais, as medidas e os cuidados disponíveis na página de cada peça. Informações marcadas como pendentes devem ser confirmadas antes da compra. A indicação “Preço em breve” não permite concluir uma compra.", "As cores podem variar entre telas. Isso não afasta os direitos do consumidor quando houver divergência entre o produto recebido e a oferta."] },
+    { title: "Carrinho e disponibilidade", paragraphs: ["Favoritos e carrinho ficam salvos no navegador utilizado. A revisão consulta preços e estoque naquele momento, mas não reserva unidades. As condições completas deverão ser apresentadas e confirmadas antes de uma futura contratação."] },
+    { title: "Uso responsável e privacidade", paragraphs: ["Utilize os recursos para suas finalidades e não tente acessar contas de terceiros, interferir no funcionamento do site ou inserir conteúdo malicioso. A política de privacidade explica o uso de dados e das preferências de navegação."] },
+    { title: "Atualizações e atendimento", paragraphs: ["Estas informações podem ser atualizadas para acompanhar a abertura de novos recursos. Atualizações não retiram direitos assegurados por lei nem alteram unilateralmente condições de compras já contratadas. Para dúvidas, utilize os canais de contato da loja."] },
+  ],
+};
+
+export const faqItems = [
+  { question: "Já posso comprar pelo site?", answer: "A loja está funcionando como vitrine. Você pode conhecer as peças e salvar favoritos; a confirmação da compra, o pagamento e o frete ainda estão em preparação." },
+  { question: "O que significa “Preço em breve”?", answer: "A peça está apresentada no catálogo, mas ainda não está liberada para compra. O preço e a disponibilidade precisam ser definidos antes da abertura das vendas." },
+  { question: "Onde encontro medidas, materiais e cuidados?", answer: "Abra a página da peça para consultar as informações cadastradas. Se algum detalhe estiver em preparação, confirme com a loja antes de comprar. As características variam conforme o modelo." },
+  { question: "Meus favoritos e meu carrinho ficam salvos?", answer: "Sim, neste navegador. Eles não são sincronizados entre dispositivos. Limpar os dados do navegador pode apagar essas escolhas, e colocar uma peça no carrinho não reserva estoque." },
+  { question: "Quanto custa o frete e qual é o prazo?", answer: "O cálculo de frete ainda não está disponível. Os custos, prazos e locais atendidos serão informados antes da confirmação da compra quando as vendas forem abertas." },
+  { question: "Quais formas de pagamento serão aceitas?", answer: "As formas de pagamento serão apresentadas quando o checkout estiver disponível. Neste momento não há cobrança por esta vitrine." },
+  { question: "Como funcionam trocas e devoluções?", answer: "Consulte as orientações de trocas e devoluções e fale com o atendimento para tratar de uma compra. Os direitos previstos na legislação de consumo são preservados.", href: "/trocas-e-devolucoes", linkLabel: "Consultar trocas e devoluções" },
+  { question: "Como falo com a Doce Costura?", answer: "Os contatos cadastrados e os horários de atendimento estão na página de contato. Se um canal ainda não estiver informado, ele aparecerá assim que for disponibilizado pela loja.", href: "/contato", linkLabel: "Ver canais de contato" },
+];
