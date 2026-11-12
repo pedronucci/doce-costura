@@ -47,7 +47,7 @@ export function Header({ categoryNav, searchItems }: { categoryNav: NavLink[]; s
           scrolled ? "border-dourado/25 shadow-[0_8px_24px_-18px_rgba(90,47,20,0.35)]" : "border-transparent",
         )}
       >
-        <div className="mx-auto grid h-[4.5rem] max-w-7xl grid-cols-[1fr_auto_1fr] items-center px-1.5 sm:px-6 lg:h-24 lg:px-8">
+        <div className="mx-auto grid h-[4.5rem] max-w-7xl grid-cols-[1fr_auto_1fr] items-center px-1.5 sm:px-6 lg:h-32 lg:px-8">
           <div className="flex items-center gap-0.5">
             <button type="button" className={cn(iconBtn, "lg:hidden")} onClick={() => setMenuOpen(true)} aria-label="Abrir menu">
               <Menu className="h-[1.35rem] w-[1.35rem]" strokeWidth={1.4} />
@@ -81,7 +81,7 @@ export function Header({ categoryNav, searchItems }: { categoryNav: NavLink[]; s
         </div>
 
         <nav aria-label="Categorias" className="hidden border-t border-dourado/15 lg:block">
-          <ul className="mx-auto flex h-12 max-w-7xl items-center justify-center gap-9 px-8">
+          <ul className="mx-auto flex min-h-12 max-w-7xl flex-wrap items-center justify-center gap-x-7 gap-y-2 px-8 py-2">
             <li>
               <Link href="/colecao" className="nav-link">
                 Toda a coleção

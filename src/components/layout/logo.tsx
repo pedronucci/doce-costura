@@ -1,4 +1,5 @@
 import Link from "next/link";
+import Image from "next/image";
 import { cn } from "@/lib/format";
 import { Bow } from "@/components/ui/ornaments";
 
@@ -14,8 +15,9 @@ export function Wordmark({ className, compact = false }: { className?: string; c
       aria-label="Doce Costura — página inicial"
       className={cn("group inline-flex flex-col items-center leading-none", className)}
     >
-      <Bow className={cn("mb-0.5 h-3.5 w-6 transition-transform duration-500 ease-suave group-hover:-rotate-3", !compact && "lg:h-4 lg:w-7")} />
-      <span className="flex items-baseline gap-1.5 whitespace-nowrap">
+      <Bow className={cn("mb-0.5 h-3.5 w-6 transition-transform duration-500 ease-suave group-hover:-rotate-3", !compact && "lg:hidden")} />
+      {!compact && <Image src="/images/marca/logo-doce-costura.webp" alt="" width={720} height={695} sizes="110px" className="hidden h-24 w-auto lg:block" />}
+      <span className={cn("flex items-baseline gap-1.5 whitespace-nowrap", !compact && "lg:hidden")}>
         <span className={cn("font-serif text-[1.45rem] font-semibold tracking-tight text-cacau", !compact && "sm:text-[1.6rem] lg:text-[1.9rem]")}>
           Doce
         </span>

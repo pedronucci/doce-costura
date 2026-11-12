@@ -10,13 +10,14 @@ Legenda: ✔ concluída · ◐ simulada/provisória · ○ pendente
 | Homepage navegável (mobile e desktop) | ✔ | Agora lê os produtos do banco |
 | Cabeçalho, menu mobile, busca instantânea | ✔ | Busca sobre o catálogo visível |
 | Favoritos com contador | ◐ | Salvo no navegador; sincronização com a conta na Etapa 3 |
-| Contador do carrinho | ◐ | Estrutura pronta; carrinho completo na Etapa 2 |
+| Carrinho local por variação | ◐ | Quantidades, remoção e subtotal estimado; sem pedido, reserva ou checkout |
 | Barra de benefícios configurável | ✔ | Sem benefícios cadastrados, mostra o slogan |
-| Consentimento de cookies (LGPD) | ✔ | |
-| Newsletter com consentimento | ◐ | Valida; gravação e double opt-in pendentes |
+| Preferências de cookies | ◐ | Aceite/rejeição e reabertura pelo rodapé; scripts de analytics ainda não implementados |
+| Newsletter com consentimento | ◐ | Formulário desabilitado com aviso prévio; gravação e double opt-in pendentes |
 | Botão de WhatsApp | ◐ | Oculto até o número ser informado |
 | Sitemap, robots, metadados, cabeçalhos de segurança | ✔ | Sitemap a partir do banco |
-| Páginas internas (catálogo, produto, carrinho, institucionais) | ○ | Rotas exibem “Em preparação” (Etapa 2). Endereços inexistentes mostram “Página não encontrada”, mas ainda com código HTTP 200 — corrigido quando as rotas definitivas entrarem. |
+| Catálogo, categorias, busca, produto e favoritos | ✔ / ◐ | Interfaces implementadas e testadas em prévia local; integração com banco ainda não validada nesta cópia |
+| Páginas institucionais e conta | ○ | Continuam em preparação |
 
 ## Antecipado da Etapa 3 — Painel de produtos
 
@@ -38,7 +39,7 @@ Legenda: ✔ concluída · ◐ simulada/provisória · ○ pendente
 
 | Etapa | Itens | Status |
 |---|---|---|
-| 2 — Interface | Catálogo com filtros, página de produto (galeria, zoom, variações, frete), carrinho, páginas institucionais, dados estruturados | ○ |
+| 2 — Interface | Catálogo com filtros, produto com galeria/ampliação/variações, favoritos e carrinho local implementados; frete, institucionais e dados estruturados pendentes | ◐ |
 | 3 — Backend (restante) | Área do cliente, pedidos, cupons, configurações da loja, e-mails | ○ |
 | 4 — Pagamentos e logística | Mercado Pago (testes), webhooks, Melhor Envio (sandbox) | ○ |
 | 5 — Testes | Fluxos de compra, segurança, webhooks, responsividade | ○ |

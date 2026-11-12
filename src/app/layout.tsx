@@ -15,7 +15,7 @@ export const metadata: Metadata = {
     template: `%s | ${storeSettings.name}`,
   },
   description:
-    "Panos de prato decorados com renda, babados e estampas delicadas. Enxovais e detalhes para sua cozinha.",
+    "Enxovais de cozinha, estampas e detalhes para deixar sua casa ainda mais sua. Conheça a coleção Doce Costura.",
   openGraph: {
     type: "website",
     locale: "pt_BR",
@@ -32,7 +32,7 @@ export const viewport: Viewport = {
 
 export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
-    <html lang="pt-BR" className="h-full antialiased">
+    <html lang="pt-BR" data-scroll-behavior="smooth" className="h-full antialiased">
       <body className="flex min-h-full flex-col">{children}</body>
     </html>
   );

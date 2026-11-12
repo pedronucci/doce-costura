@@ -27,7 +27,7 @@ export function SearchDialog({ open, onClose, items }: { open: boolean; onClose:
   return (
     <Drawer open={open} onClose={onClose} title="Buscar produtos" side="top">
       <div className="mx-auto w-full max-w-3xl px-5 pt-14 pb-8 sm:px-8">
-        <form role="search" action="/busca" className="relative" onSubmit={(e) => e.preventDefault()}>
+        <form role="search" action="/busca" className="relative" onSubmit={onClose}>
           <label htmlFor="busca" className="sr-only">
             Buscar produtos
           </label>

@@ -1,6 +1,7 @@
 "use client";
 
 import { createContext, useCallback, useContext, useMemo, useSyncExternalStore } from "react";
+import { addCartLine, parseCart, validQuantity, type CartLine } from "./cart";
 
 /**
  * Estado do visitante no navegador (Etapa 1–2): favoritos e itens do carrinho.
@@ -10,10 +11,9 @@ import { createContext, useCallback, useContext, useMemo, useSyncExternalStore }
  * estoque e total é recalculado no backend — o navegador nunca define valores.
  */
 
-type CartLine = { slug: string; quantity: number };
 type ShopState = { favorites: string[]; cart: CartLine[] };
 
-const STORAGE_KEY = "dc:shop:v1";
+const STORAGE_KEY = "dc:shop:v2";
 const EMPTY: ShopState = { favorites: [], cart: [] };
 
 let memoryState: ShopState = EMPTY;
@@ -24,14 +24,12 @@ function read(): ShopState {
   if (!hydrated && typeof window !== "undefined") {
     hydrated = true;
     try {
-      const raw = window.localStorage.getItem(STORAGE_KEY);
+      const raw = window.localStorage.getItem(STORAGE_KEY) ?? window.localStorage.getItem("dc:shop:v1");
       if (raw) {
         const parsed = JSON.parse(raw) as Partial<ShopState>;
         memoryState = {
           favorites: Array.isArray(parsed.favorites) ? parsed.favorites.filter((s) => typeof s === "string") : [],
-          cart: Array.isArray(parsed.cart)
-            ? parsed.cart.filter((l) => typeof l?.slug === "string" && Number.isInteger(l?.quantity) && l.quantity > 0)
-            : [],
+          cart: parseCart(parsed.cart),
         };
       }
     } catch {
@@ -54,7 +52,8 @@ function write(next: ShopState) {
 function subscribe(listener: () => void) {
   listeners.add(listener);
   const onStorage = (e: StorageEvent) => {
-    if (e.key === STORAGE_KEY) {
+    if (e.key === STORAGE_KEY || e.key === null) {
+      memoryState = EMPTY;
       hydrated = false;
       listener();
     }
@@ -69,6 +68,10 @@ function subscribe(listener: () => void) {
 type ShopContextValue = {
   favorites: string[];
   cartCount: number;
+  cart: CartLine[];
+  addToCart: (line: CartLine, available: number) => void;
+  setQuantity: (variantId: string, quantity: number) => void;
+  removeFromCart: (variantId: string) => void;
   isFavorite: (slug: string) => boolean;
   toggleFavorite: (slug: string) => void;
 };
@@ -90,6 +93,20 @@ export function ShopProvider({ children }: { children: React.ReactNode }) {
     () => ({
       favorites: state.favorites,
       cartCount: state.cart.reduce((sum, l) => sum + l.quantity, 0),
+      cart: state.cart,
+      addToCart: (line, available) => {
+        const current = read();
+        write({ ...current, cart: addCartLine(current.cart, line, available) });
+      },
+      setQuantity: (variantId, quantity) => {
+        if (!validQuantity(quantity)) return;
+        const current = read();
+        write({ ...current, cart: current.cart.map((l) => l.variantId === variantId ? { ...l, quantity } : l) });
+      },
+      removeFromCart: (variantId) => {
+        const current = read();
+        write({ ...current, cart: current.cart.filter((l) => l.variantId !== variantId) });
+      },
       isFavorite: (slug) => state.favorites.includes(slug),
       toggleFavorite,
     }),

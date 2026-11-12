@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useState, useSyncExternalStore } from "react";
+import { useEffect, useState, useSyncExternalStore } from "react";
 import { cn } from "@/lib/format";
 
 /**
@@ -43,10 +43,25 @@ export function CookieConsent() {
   const [marketing, setMarketing] = useState(false);
   const [dismissed, setDismissed] = useState(false);
 
-  if (stored !== null || dismissed) return null;
+  useEffect(() => {
+    const reopen = () => {
+      try {
+        const saved = JSON.parse(readConsent() ?? "null") as ConsentState | null;
+        setAnalytics(saved?.analytics === true);
+        setMarketing(saved?.marketing === true);
+      } catch { setAnalytics(false); setMarketing(false); }
+      setDismissed(false);
+      setCustomizing(true);
+    };
+    window.addEventListener("dc:cookie-preferences", reopen);
+    return () => window.removeEventListener("dc:cookie-preferences", reopen);
+  }, []);
+
+  if ((stored !== null || dismissed) && !customizing) return null;
 
   const decide = (a: boolean, m: boolean) => {
     saveConsent({ analytics: a, marketing: m, decidedAt: new Date().toISOString() });
+    setCustomizing(false);
     setDismissed(true);
   };
 
@@ -111,6 +126,10 @@ export function CookieConsent() {
       </div>
     </section>
   );
+}
+
+export function CookiePreferencesButton() {
+  return <button type="button" onClick={() => window.dispatchEvent(new Event("dc:cookie-preferences"))} className="min-h-11 text-left text-sm text-rosa-profundo underline underline-offset-4">Preferências de cookies</button>;
 }
 
 function btn(kind: "primary" | "outline" | "ghost") {

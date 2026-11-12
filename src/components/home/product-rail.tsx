@@ -27,7 +27,7 @@ export function ProductRail({
     <section aria-labelledby={`${id}-title`} className="py-20 sm:py-24">
       <div className="mx-auto max-w-7xl px-5 sm:px-8">
         <SectionHeading id={`${id}-title`} eyebrow={eyebrow} title={title} description={description} />
-        <ul className="mt-12 grid grid-cols-2 gap-x-4 gap-y-10 sm:gap-x-6 lg:grid-cols-3 lg:gap-x-8">
+        <ul className="mt-12 grid grid-cols-2 gap-x-4 gap-y-10 sm:gap-x-6 lg:grid-cols-4 lg:gap-x-8">
           {products.map((p) => (
             <li key={p.slug}>
               <ProductCard product={p} sizes="(min-width: 1024px) 30vw, 46vw" />

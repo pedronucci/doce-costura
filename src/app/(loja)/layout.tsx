@@ -24,6 +24,7 @@ export default async function LojaLayout({ children }: LayoutProps<"/">) {
         Pular para o conteúdo
       </a>
       <AnnouncementBar />
+      {process.env.STOREFRONT_PREVIEW === "1" && process.env.NODE_ENV !== "production" && <p className="bg-salvia-escuro px-4 py-2 text-center text-xs text-papel">Prévia local • catálogo inicial sem conexão com o banco • compras indisponíveis</p>}
       <Header categoryNav={categoryNav} searchItems={searchItems} />
       <main id="conteudo" className="flex-1">
         {children}

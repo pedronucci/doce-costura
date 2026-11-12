@@ -4,6 +4,7 @@ import { storeSettings } from "@/lib/config/store";
 import { institutionalNav, policyNav } from "@/lib/catalog/navigation";
 import { getCategoryNav } from "@/lib/catalog/queries";
 import { Pending } from "@/components/ui/pending";
+import { CookiePreferencesButton } from "./cookie-consent";
 
 function FooterColumn({ title, links }: { title: string; links: { href: string; label: string }[] }) {
   return (
@@ -38,8 +39,9 @@ export async function Footer() {
             className="h-auto w-44"
           />
           <p className="mt-4 max-w-xs text-[0.92rem] leading-relaxed text-tinta-suave">
-            Panos de prato decorados com renda, babados e estampas delicadas.
+            Enxovais, estampas e detalhes para deixar sua casa ainda mais sua.
           </p>
+          <CookiePreferencesButton />
         </div>
 
         <div className="grid grid-cols-2 gap-10 sm:grid-cols-3">

@@ -30,6 +30,8 @@ export type Product = {
   status: "coming_soon" | "active";
   isFeatured: boolean;
   name: string;
+  description: string | null;
+  variants: { id: string; name: string; priceCents: number | null; compareAtPriceCents: number | null; stock: number }[];
   /** Descrição curta exibida em cards. Baseada apenas no que é visível na foto. */
   summary: string;
   categorySlugs: string[];

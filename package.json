@@ -4,10 +4,11 @@
   "private": true,
   "scripts": {
     "dev": "next dev",
+    "dev:preview": "node scripts/dev-preview.mjs",
     "build": "next build",
     "start": "next start",
     "lint": "eslint",
-    "typecheck": "tsc --noEmit",
+    "typecheck": "next typegen && tsc --noEmit",
     "preview:export": "bash scripts/preview-export.sh",
     "db:generate": "drizzle-kit generate",
     "db:migrate": "drizzle-kit migrate",
@@ -46,6 +47,6 @@
     "vitest": "^5.0.5"
   },
   "engines": {
-    "node": ">=22"
+    "node": "24.x"
   }
 }

@@ -1,7 +1,6 @@
 import "server-only";
 import { asc, inArray } from "drizzle-orm";
 import { cacheLife, cacheTag } from "next/cache";
-import { db } from "@/db";
 import { category, product, productImage, productVariant } from "@/db/schema";
 import { CATALOG_TAG } from "./tags";
 import type { Category, Product } from "./types";
@@ -16,6 +15,11 @@ export async function getStorefrontProducts(): Promise<Product[]> {
   "use cache";
   cacheTag(CATALOG_TAG);
   cacheLife("days");
+
+  if (process.env.STOREFRONT_PREVIEW === "1" && process.env.NODE_ENV !== "production") {
+    return (await import("./preview")).previewProducts;
+  }
+  const { db } = await import("@/db");
 
   const rows = await db.query.product.findMany({
     where: inArray(product.status, [...VISIBLE]),
@@ -37,6 +41,8 @@ export async function getStorefrontProducts(): Promise<Product[]> {
       id: p.id,
       slug: p.slug,
       name: p.name,
+      description: p.description,
+      variants: variants.map((v) => ({ id: v.id, name: v.name, priceCents: forSale ? v.priceCents : null, compareAtPriceCents: forSale ? v.compareAtPriceCents : null, stock: forSale ? Math.max(0, v.stock - v.reserved) : 0 })),
       summary: p.summary ?? "",
       status: p.status as Product["status"],
       isFeatured: p.isFeatured,
@@ -62,6 +68,10 @@ export async function getCategories(): Promise<Category[]> {
   "use cache";
   cacheTag(CATALOG_TAG);
   cacheLife("days");
+  if (process.env.STOREFRONT_PREVIEW === "1" && process.env.NODE_ENV !== "production") {
+    return (await import("./preview")).previewCategories;
+  }
+  const { db } = await import("@/db");
   const rows = await db.select().from(category).orderBy(asc(category.position), asc(category.name));
   return rows
     .filter((c) => c.isActive)

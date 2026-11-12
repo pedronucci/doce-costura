@@ -1,4 +1,5 @@
 import { Hero } from "@/components/home/hero";
+import { CategoryDiscovery } from "@/components/home/category-discovery";
 import { FeaturedCollection } from "@/components/home/featured-collection";
 import { ProductRail } from "@/components/home/product-rail";
 import { PrintPicker } from "@/components/home/print-picker";
@@ -21,6 +22,7 @@ export default async function HomePage() {
   return (
     <>
       <Hero />
+      <CategoryDiscovery products={products} categories={categories} />
 
       {/* 1. Coleção em destaque */}
       <FeaturedCollection products={products} categories={categories} />
@@ -32,7 +34,7 @@ export default async function HomePage() {
       <ProductRail
         id="novidades"
         eyebrow="Acabaram de chegar"
-        title="Novidades"
+        title="Estampas que encantam"
         description="Conheça as estampas mais recentes da Doce Costura."
         products={newest}
         cta={{ href: "/colecao", label: "Ver toda a coleção" }}

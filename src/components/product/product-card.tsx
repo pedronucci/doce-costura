@@ -22,7 +22,7 @@ export function ProductCard({
   return (
     <article className={cn("group relative flex flex-col", className)}>
       <div className="relative overflow-hidden rounded-[1.4rem] bg-linho">
-        <Link href={href} tabIndex={-1} aria-hidden="true" className="block aspect-[4/5]">
+        <Link href={href} tabIndex={-1} aria-hidden="true" className="relative block aspect-[4/5]">
           {image ? (
             <Image
               src={image.src}

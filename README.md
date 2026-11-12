@@ -2,7 +2,7 @@
 
 Enxovais e detalhes para sua cozinha. Next.js 16 + TypeScript + Tailwind CSS 4 + PostgreSQL (Supabase) + Drizzle ORM + Better Auth.
 
-> **Status:** Etapa 1 concluída e painel de produtos antecipado. A loja **não está pronta para vendas reais**. Veja `docs/STATUS.md`.
+> **Status:** identidade visual aplicada, catálogo, produto, favoritos e carrinho local implementados; painel de produtos existente. A loja **não está pronta para vendas reais**. Veja `docs/STATUS.md`.
 
 ## Começar
 
@@ -10,6 +10,10 @@ Enxovais e detalhes para sua cozinha. Next.js 16 + TypeScript + Tailwind CSS 4 +
 - Arquitetura e identidade visual: `docs/ARQUITETURA.md`
 
 ## Desenvolvimento local
+
+Para conferir apenas a vitrine e a identidade visual **sem configurar banco**, execute `npm install` e `npm run dev:preview`. Abra `http://localhost:3000`. Este modo local exibe o catálogo inicial sem preços nem estoque e não habilita painel, pedidos, frete ou pagamentos. Não é uma opção de publicação em produção.
+
+Propostas e revisão: `docs/ANALISE-E-PROPOSTA.md`. Implementação e verificações mais recentes: `docs/IMPLEMENTACAO-E-PUBLICACAO.md`.
 
 Requisitos: Node.js 22+, npm 10+ e um PostgreSQL 15+ (o do Supabase ou um local).
 

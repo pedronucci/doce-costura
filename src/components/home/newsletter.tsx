@@ -27,7 +27,7 @@ export function Newsletter() {
         </h2>
         <FlourishHeart className="mx-auto mt-4 text-dourado" />
         <p className="mx-auto mt-5 max-w-md leading-relaxed text-tinta-suave">
-          Receba lançamentos de estampas e coleções. Você pode cancelar quando quiser.
+          Em breve, você poderá receber lançamentos de estampas e coleções. As inscrições ainda não estão abertas.
         </p>
 
         <form
@@ -58,6 +58,7 @@ export function Newsletter() {
               inputMode="email"
               autoComplete="email"
               required
+              disabled
               placeholder="seu@email.com"
               aria-invalid={status.kind === "error"}
               aria-describedby="newsletter-status"
@@ -65,13 +66,14 @@ export function Newsletter() {
             />
             <button
               type="submit"
+              disabled
               className="min-h-12 rounded-full bg-rosa-profundo px-7 text-[0.78rem] font-medium tracking-[0.18em] text-papel uppercase transition-colors hover:bg-rosa-escuro"
             >
-              Quero receber
+              Em breve
             </button>
           </div>
           <label className="mt-4 flex items-start gap-3 text-[0.82rem] leading-relaxed text-tinta-suave">
-            <input type="checkbox" name="consent" className="mt-1 h-4 w-4 shrink-0 accent-rosa-profundo" />
+            <input type="checkbox" name="consent" disabled className="mt-1 h-4 w-4 shrink-0 accent-rosa-profundo" />
             <span>
               Autorizo a Doce Costura a me enviar comunicações por e-mail, conforme a{" "}
               <Link href="/politica-de-privacidade" className="text-rosa-profundo underline underline-offset-4">

@@ -33,11 +33,10 @@ export function GiftKits({ kits }: { kits: Product[] }) {
             </h2>
             <SprigHeart className="mx-auto mt-3 text-dourado" />
             <p className="mx-auto mt-5 max-w-lg leading-relaxed text-tinta-suave">
-              Estamos preparando combinações especiais para presentear quem você ama. Inscreva-se na nossa newsletter para
-              saber quando chegarem.
+              Estamos preparando combinações especiais para presentear quem você ama. Enquanto isso, conheça as estampas da coleção.
             </p>
-            <ButtonLink href="#newsletter" variant="outline" className="mt-8">
-              Avise-me
+            <ButtonLink href="/colecao" variant="outline" className="mt-8">
+              Conhecer as peças
             </ButtonLink>
           </div>
         )}
