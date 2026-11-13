@@ -20,7 +20,6 @@ const planned: Record<string, { title: string; stage: string }> = {
   busca: { title: "Busca", stage: "Etapa 2 — Interface" },
   carrinho: { title: "Carrinho", stage: "Etapa 2 — Interface" },
   favoritos: { title: "Favoritos", stage: "Etapa 2 — Interface" },
-  conta: { title: "Minha conta", stage: "Etapa 3 — Backend" },
   sobre: { title: "Sobre nós", stage: "Etapa 2 — Interface" },
   contato: { title: "Contato", stage: "Etapa 2 — Interface" },
   "perguntas-frequentes": { title: "Perguntas frequentes", stage: "Etapa 2 — Interface" },

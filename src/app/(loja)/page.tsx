@@ -8,11 +8,16 @@ import { Newsletter } from "@/components/home/newsletter";
 import { SectionHeading } from "@/components/ui/section-heading";
 import { getCategories, getStorefrontProducts, productsInCategory } from "@/lib/catalog/queries";
 import type { Product } from "@/lib/catalog/types";
+import { Suspense } from "react";
 
 /** Mais vendidos e avaliações só aparecem com dados reais (pedidos pagos / avaliações verificadas). */
 const bestSellers: Product[] = [];
 
-export default async function HomePage() {
+export default function HomePage() {
+  return <Suspense fallback={<><Hero /><p role="status" className="p-12 text-center">Preparando sua coleção…</p></>}><HomeContent /></Suspense>;
+}
+
+async function HomeContent() {
   const [products, categories] = await Promise.all([getStorefrontProducts(), getCategories()]);
   const newest = [...products]
     .sort((a, b) => b.createdAt.localeCompare(a.createdAt))

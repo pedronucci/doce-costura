@@ -1,7 +1,7 @@
 "use client";
 
 import { createContext, useCallback, useContext, useMemo, useSyncExternalStore } from "react";
-import { addCartLine, parseCart, validQuantity, type CartLine } from "./cart";
+import { addCartLine, parseCart, removeOrderedLines, validQuantity, type CartLine } from "./cart";
 
 /**
  * Estado do visitante no navegador (Etapa 1–2): favoritos e itens do carrinho.
@@ -72,6 +72,7 @@ type ShopContextValue = {
   addToCart: (line: CartLine, available: number) => void;
   setQuantity: (variantId: string, quantity: number) => void;
   removeFromCart: (variantId: string) => void;
+  completeOrder: (items: Array<{ variantId: string; quantity: number }>) => void;
   isFavorite: (slug: string) => boolean;
   toggleFavorite: (slug: string) => void;
 };
@@ -106,6 +107,10 @@ export function ShopProvider({ children }: { children: React.ReactNode }) {
       removeFromCart: (variantId) => {
         const current = read();
         write({ ...current, cart: current.cart.filter((l) => l.variantId !== variantId) });
+      },
+      completeOrder: (items) => {
+        const current = read();
+        write({ ...current, cart: removeOrderedLines(current.cart, items) });
       },
       isFavorite: (slug) => state.favorites.includes(slug),
       toggleFavorite,

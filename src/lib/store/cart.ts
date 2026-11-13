@@ -1,6 +1,12 @@
 export type CartLine = { slug: string; variantId: string; quantity: number };
 export const MAX_CART_QUANTITY = 99;
 
+/** Remove apenas as unidades pedidas, preservando adições feitas enquanto a requisição estava em andamento. */
+export function removeOrderedLines(cart: CartLine[], items: Array<{ variantId: string; quantity: number }>): CartLine[] {
+  const quantities = new Map(items.map((item) => [item.variantId, item.quantity]));
+  return cart.map((line) => ({ ...line, quantity: Math.max(0, line.quantity - (quantities.get(line.variantId) ?? 0)) })).filter((line) => line.quantity > 0);
+}
+
 export function validQuantity(value: unknown): value is number {
   return typeof value === "number" && Number.isInteger(value) && value > 0 && value <= MAX_CART_QUANTITY;
 }

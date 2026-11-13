@@ -19,7 +19,7 @@ Legenda: ✔ concluída · ◐ simulada/provisória · ○ pendente
 | Catálogo, categorias, busca, produto e favoritos | ✔ / ◐ | Publicados com Supabase; catálogo, busca e detalhes verificados no site público. Favoritos permanecem locais |
 | Revisão da compra | ◐ | `/checkout` confere preços e estoque no servidor; sem confirmação, reserva ou cobrança. Ver `docs/CHECKOUT-E-PEDIDOS.md` |
 | Páginas institucionais | ✔ / ◐ | Sobre, Contato, FAQ e políticas implementados; identidade empresarial e revisão operacional/jurídica antes das vendas pendentes. Ver `docs/PAGINAS-INSTITUCIONAIS.md` |
-| Conta do cliente | ○ | Continua em preparação |
+| Conta do cliente | ✔ / ◐ | Cadastro, login, perfil, endereços e pedidos próprios; recuperação depende de configurar e-mail. Ver `docs/CONTA-CLIENTE-E-PEDIDOS.md` |
 
 ## Antecipado da Etapa 3 — Painel de produtos
 
@@ -35,7 +35,8 @@ Legenda: ✔ concluída · ◐ simulada/provisória · ○ pendente
 | Upload de fotos | ✔ / ◐ | Testado com armazenamento local; **Supabase Storage implementado, mas não testado daqui** (o Supabase não é acessível do ambiente de desenvolvimento) |
 | Histórico de estoque e auditoria | ✔ | |
 | Vitrine atualizada ao salvar | ✔ | Cache renovado a cada alteração |
-| Consulta de pedidos | ◐ | Lista paginada e detalhes protegidos para equipe/admin; criação, pagamento e operação de envio pendentes |
+| Consulta de pedidos | ◐ | Lista paginada e detalhes protegidos para equipe/admin; pedidos com reserva já são criados pelo cliente; pagamento e envio pendentes |
+| Criação de pedidos | ✔ / ◐ | Pedido com reserva de 30 minutos, idempotência, cancelamento e expiração; sem pagamento/frete ou venda concluída |
 | Configurações da loja | ✔ / ◐ | Empresa, contatos, WhatsApp, Instagram, mensagens e CEP de origem editáveis por admin; dados reais aguardam preenchimento. Ver `docs/CONFIGURACOES-DA-LOJA.md` |
 | Importação por planilha (ex.: exportação da Shopee) | ○ | Aguardando o arquivo exportado |
 

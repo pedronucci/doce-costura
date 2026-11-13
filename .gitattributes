@@ -1,0 +1,2 @@
+# Migrações devem ter o mesmo SHA256 em Windows, Linux e no registro Drizzle.
+*.sql text eol=lf

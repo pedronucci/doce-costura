@@ -111,6 +111,7 @@ export async function saveProduct(data: ProductData, actorId: string) {
   const removedKeys: string[] = [];
 
   const productId = await db.transaction(async (tx) => {
+    await tx.execute(sql`select pg_advisory_xact_lock(hashtext('doce-costura:inventory-reservations'))`);
     // Endereço (slug) único
     const slugTaken = await tx
       .select({ id: product.id })
@@ -221,6 +222,7 @@ export async function saveProduct(data: ProductData, actorId: string) {
       };
       const old = v.id ? currentVariants.find((c) => c.id === v.id) : undefined;
       if (old) {
+        if (v.stock < old.reserved) throw new UserFacingError(`O estoque de ${v.name} não pode ser menor que as ${old.reserved} unidades reservadas.`);
         await tx.update(productVariant).set(row).where(eq(productVariant.id, old.id));
         if (old.stock !== v.stock) {
           await tx.insert(stockMovement).values({

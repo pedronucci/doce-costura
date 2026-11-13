@@ -28,13 +28,12 @@ export const auth = betterAuth({
   },
   emailAndPassword: {
     enabled: true,
-    // Cadastro público de clientes será liberado na Etapa 3.
-    disableSignUp: true,
+    disableSignUp: false,
     minPasswordLength: MIN_PASSWORD_LENGTH,
     maxPasswordLength: 128,
     resetPasswordTokenExpiresIn: 60 * 60,
     revokeSessionsOnPasswordReset: true,
-    sendResetPassword: async ({ user: u, url }) => {
+    sendResetPassword: process.env.RESEND_API_KEY && process.env.EMAIL_FROM ? async ({ user: u, url }) => {
       const name = escapeHtml(u.name);
       await sendEmail({
         to: u.email,
@@ -42,7 +41,7 @@ export const auth = betterAuth({
         text: `Olá, ${u.name}.\n\nPara criar uma nova senha, acesse: ${url}\n\nO link vale por 1 hora. Se você não pediu a redefinição, ignore este e-mail.`,
         html: `<p>Olá, ${name}.</p><p>Para criar uma nova senha, <a href="${url}">clique aqui</a>.</p><p>O link vale por 1 hora. Se você não pediu a redefinição, ignore este e-mail.</p>`,
       });
-    },
+    } : undefined,
   },
   session: {
     expiresIn: 60 * 60 * 24 * 7, // 7 dias
@@ -55,6 +54,7 @@ export const auth = betterAuth({
     max: 100,
     customRules: {
       "/sign-in/email": { window: 60, max: 5 },
+      "/sign-up/email": { window: 900, max: 5 },
       "/request-password-reset": { window: 300, max: 3 },
       "/reset-password": { window: 300, max: 5 },
     },

@@ -5,8 +5,9 @@ import { WhatsAppButton } from "@/components/layout/whatsapp-button";
 import { CookieConsent } from "@/components/layout/cookie-consent";
 import { ShopProvider } from "@/lib/store/shop-context";
 import { getCategoryNav, getStorefrontProducts } from "@/lib/catalog/queries";
+import { Suspense } from "react";
 
-export default async function LojaLayout({ children }: LayoutProps<"/">) {
+async function StoreHeader() {
   const [categoryNav, products] = await Promise.all([getCategoryNav(), getStorefrontProducts()]);
   const searchItems = products.map((p) => ({
     slug: p.slug,
@@ -15,6 +16,10 @@ export default async function LojaLayout({ children }: LayoutProps<"/">) {
     printName: p.print?.name ?? "",
     image: p.images[0]?.src ?? null,
   }));
+  return <Header categoryNav={categoryNav} searchItems={searchItems} />;
+}
+
+export default function LojaLayout({ children }: LayoutProps<"/">) {
   return (
     <ShopProvider>
       <a
@@ -24,12 +29,13 @@ export default async function LojaLayout({ children }: LayoutProps<"/">) {
         Pular para o conteúdo
       </a>
       <AnnouncementBar />
+      {process.env.LOCAL_TEST_STORE === "1" && process.env.NODE_ENV !== "production" && <p className="bg-salvia-escuro px-4 py-2 text-center text-xs text-papel">Ambiente local de testes • dados fictícios • sem cobranças</p>}
       {process.env.STOREFRONT_PREVIEW === "1" && process.env.NODE_ENV !== "production" && <p className="bg-salvia-escuro px-4 py-2 text-center text-xs text-papel">Prévia local • catálogo inicial sem conexão com o banco • compras indisponíveis</p>}
-      <Header categoryNav={categoryNav} searchItems={searchItems} />
+      <Suspense fallback={<Header categoryNav={[]} searchItems={[]} />}><StoreHeader /></Suspense>
       <main id="conteudo" className="flex-1">
         {children}
       </main>
-      <Footer />
+      <Suspense fallback={<footer aria-busy="true" className="min-h-40 border-t border-dourado/20 bg-[#faf3ea]" />}><Footer /></Suspense>
       <WhatsAppButton />
       <CookieConsent />
     </ShopProvider>

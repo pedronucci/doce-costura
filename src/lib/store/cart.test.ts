@@ -1,8 +1,13 @@
 import { describe, expect, it } from "vitest";
-import { addCartLine, parseCart } from "./cart";
+import { addCartLine, parseCart, removeOrderedLines } from "./cart";
 
 const line = { slug: "produto-teste", variantId: "variante-a", quantity: 2 };
 describe("carrinho local por variação", () => {
+  it("após criar pedido, preserva novas unidades e outras escolhas feitas durante a requisição", () => {
+    const other = { slug: "outro-produto", variantId: "variante-b", quantity: 1 };
+    expect(removeOrderedLines([{ ...line, quantity: 3 }, other], [{ variantId: line.variantId, quantity: 2 }])).toEqual([{ ...line, quantity: 1 }, other]);
+    expect(removeOrderedLines([line], [{ variantId: line.variantId, quantity: 2 }])).toEqual([]);
+  });
   it("soma a mesma variação sem ultrapassar estoque ou limite", () => {
     expect(addCartLine([line], { ...line, quantity: 4 }, 5)).toEqual([{ ...line, quantity: 5 }]);
     expect(addCartLine([{ ...line, quantity: 98 }], line, 200)[0].quantity).toBe(99);

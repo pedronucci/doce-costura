@@ -1,11 +1,15 @@
 import "server-only";
 import { headers } from "next/headers";
 import { redirect } from "next/navigation";
+import { connection } from "next/server";
 import { auth, type Role } from "./index";
 
 /** Sessão atual (ou null). */
 export async function getSession() {
-  return auth.api.getSession({ headers: await headers() });
+  // O SDK de sessão usa data/hora internamente; execute-o apenas em uma requisição real.
+  await connection();
+  const requestHeaders = await headers();
+  return auth.api.getSession({ headers: requestHeaders });
 }
 
 /**

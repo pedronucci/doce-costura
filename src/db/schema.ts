@@ -16,6 +16,7 @@ import {
   bigint,
   boolean,
   char,
+  check,
   index,
   integer,
   jsonb,
@@ -226,7 +227,7 @@ export const productVariant = pgTable(
     createdAt: createdAt(),
     updatedAt: updatedAt(),
   },
-  (t) => [index("variant_product_idx").on(t.productId)],
+  (t) => [index("variant_product_idx").on(t.productId), check("variant_stock_integrity", sql`${t.stock} >= 0 and ${t.reserved} >= 0 and ${t.reserved} <= ${t.stock}`)],
 );
 
 export const productImage = pgTable(
@@ -342,6 +343,7 @@ export const coupon = pgTable("coupon", {
 // ---------------------------------------------------------------------------
 
 export const orderStatus = pgEnum("order_status", [
+  "awaiting_checkout",
   "pending_payment",
   "paid",
   "in_preparation",
@@ -360,6 +362,9 @@ export const order = pgTable(
     userId: text("user_id").references(() => user.id, { onDelete: "set null" }),
     status: orderStatus("status").notNull().default("pending_payment"),
     idempotencyKey: text("idempotency_key").notNull().unique(),
+    requestHash: text("request_hash"),
+    reservationExpiresAt: timestamp("reservation_expires_at", { withTimezone: true }),
+    reservationReleasedAt: timestamp("reservation_released_at", { withTimezone: true }),
 
     customerName: text("customer_name").notNull(),
     customerEmail: text("customer_email").notNull(),
@@ -377,8 +382,8 @@ export const order = pgTable(
 
     subtotalCents: integer("subtotal_cents").notNull(),
     discountCents: integer("discount_cents").notNull().default(0),
-    shippingCents: integer("shipping_cents").notNull(),
-    totalCents: integer("total_cents").notNull(),
+    shippingCents: integer("shipping_cents"), // null até escolher um frete válido
+    totalCents: integer("total_cents"), // null até concluir a cotação
     currency: text("currency").notNull().default("BRL"),
     couponId: uuid("coupon_id").references(() => coupon.id),
 
@@ -386,7 +391,7 @@ export const order = pgTable(
     createdAt: createdAt(),
     updatedAt: updatedAt(),
   },
-  (t) => [index("order_status_idx").on(t.status, t.createdAt), index("order_email_idx").on(t.customerEmail)],
+  (t) => [index("order_status_idx").on(t.status, t.createdAt), index("order_email_idx").on(t.customerEmail), index("order_user_created_idx").on(t.userId, t.createdAt), index("order_reservation_expiry_idx").on(t.status, t.reservationExpiresAt)],
 );
 
 export const orderItem = pgTable("order_item", {

@@ -1,6 +1,7 @@
-export const ORDER_STATUSES = ["pending_payment", "paid", "in_preparation", "shipped", "delivered", "canceled", "refunded", "partially_refunded"] as const;
+export const ORDER_STATUSES = ["awaiting_checkout", "pending_payment", "paid", "in_preparation", "shipped", "delivered", "canceled", "refunded", "partially_refunded"] as const;
 export type OrderStatus = typeof ORDER_STATUSES[number];
 export const ORDER_LABELS: Record<OrderStatus, string> = {
+  awaiting_checkout: "Aguardando conclusão",
   pending_payment: "Aguardando pagamento", paid: "Pago", in_preparation: "Em preparação", shipped: "Enviado",
   delivered: "Entregue", canceled: "Cancelado", refunded: "Reembolsado", partially_refunded: "Reembolso parcial",
 };

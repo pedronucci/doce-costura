@@ -14,7 +14,7 @@ const VISIBLE = ["coming_soon", "active"] as const;
 export async function getStorefrontProducts(): Promise<Product[]> {
   "use cache";
   cacheTag(CATALOG_TAG);
-  cacheLife("days");
+  cacheLife({ stale: 30, revalidate: 30, expire: 300 });
 
   if (process.env.STOREFRONT_PREVIEW === "1" && process.env.NODE_ENV !== "production") {
     return (await import("./preview")).previewProducts;

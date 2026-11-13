@@ -1,10 +1,11 @@
 import "server-only";
-import { and, eq, inArray } from "drizzle-orm";
+import { and, eq, inArray, sql } from "drizzle-orm";
 import { db } from "@/db";
 import { product, productVariant } from "@/db/schema";
 import { calculateQuote, type QuoteInput } from "./quote";
 
 export async function quoteCart(input: QuoteInput) {
+  await db.execute(sql`select doce_costura_private.release_order_reservations()`);
   const variants = await db.select({
     id: productVariant.id,
     productName: product.name,
