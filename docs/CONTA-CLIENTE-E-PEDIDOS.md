@@ -23,7 +23,8 @@ Recuperação de implantação: preferir correção adiante. O enum e as cópias
 
 ## Evidências
 
-- 77 testes de regras e 18 testes de integração passaram.
+- 87 testes de regras e 18 testes de integração passaram.
+- Conta e checkout possuem cabeçalhos HTTP private/no-store; páginas privadas sem cookie redirecionam antecipadamente para login, mantendo a verificação real de sessão e dono no servidor.
 - Integração usa PostgreSQL 17 local exclusivo, com dependência de desenvolvimento fixa `embedded-postgres`. Nunca usa a URL do Supabase. O cluster é encerrado e seu diretório exclusivo é removido após a execução.
 - Testes incluem última unidade disputada, solicitações simultâneas repetidas, conteúdo adulterado, endereço alheio, snapshot, rollback em falha, expiração/cancelamento repetidos, pagamento aprovado, isolamento de pedidos, papel administrativo forjado e redefinição que revoga sessões anteriores.
 - Navegador local com dados sintéticos: cadastro, endereço, adição ao carrinho, revisão, criação, cancelamento, saída e novo login passaram. Tela de pedido mobile sem transbordamento horizontal. Ajustados os limites de renderização/cache do Next 16 para conteúdo de sessão.
